@@ -1,0 +1,414 @@
+/* MindFlow Markdown - Style */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f8f9fa;
+  --color-border: #e2e8f0;
+  --color-border-hover: #cbd5e1;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-accent: #4f46e5;
+  --color-accent-hover: #4338ca;
+  --color-accent-soft: #eef2ff;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-danger-soft: #fef2f2;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --transition: 150ms ease;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+/* ───── App Shell ───── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-bg);
+}
+
+/* ───── Header ───── */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 54px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+#header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  letter-spacing: -0.3px;
+}
+
+#header .logo svg {
+  color: var(--color-accent);
+}
+
+#header .tagline {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+/* ───── Notification Bar ───── */
+#notification {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+#notification.show {
+  display: flex;
+}
+
+#notification.info {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: #c7d2fe;
+}
+
+#notification.success {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+#notification.error {
+  background: var(--color-danger-soft);
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+#notification-close {
+  margin-left: auto;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition);
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+#notification-close:hover {
+  opacity: 1;
+}
+
+/* ───── Main Layout ───── */
+#main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ───── Resizer ───── */
+#resizer {
+  width: 4px;
+  background: var(--color-border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background var(--transition);
+  position: relative;
+}
+
+#resizer:hover,
+#resizer.active {
+  background: var(--color-accent);
+}
+
+/* ───── Panels ───── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+#panel-input {
+  width: 38%;
+  min-width: 200px;
+  border-right: none;
+}
+
+#panel-output {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ───── Panel Toolbars ───── */
+.panel-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+  height: 46px;
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+/* ───── Buttons ───── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1;
+  transition: all var(--transition);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+.btn-ghost:hover {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.btn-icon {
+  padding: 5px 8px;
+}
+
+/* ───── Textarea ───── */
+#markdown-input {
+  flex: 1;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  tab-size: 2;
+  overflow-y: auto;
+}
+
+#markdown-input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+#markdown-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+#markdown-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#markdown-input::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+
+#markdown-input::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* ───── Mindmap Output ───── */
+#mindmap-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: var(--color-bg);
+}
+
+#mindmap-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Markmap overrides for white theme */
+.markmap-node circle {
+  cursor: pointer;
+}
+
+/* ───── Empty State ───── */
+#empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#empty-state svg {
+  opacity: 0.25;
+}
+
+#empty-state p {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+#empty-state.hidden {
+  opacity: 0;
+}
+
+/* ───── Footer ───── */
+#footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 30px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+#char-count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ───── Scrollbar global ───── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* ───── Iframe output ───── */
+#mindmap-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* ───── Spinner ───── */
+#spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  background: var(--color-bg);
+}
+
+.spinner-ring {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ───── Utility ───── */
+.hidden {
+  display: none !important;
+}

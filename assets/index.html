@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindFlow Markdown</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Markmap — Loaded from CDN (Ensures no Node.js required) -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.0/dist/browser/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.0/dist/browser/index.js"></script>
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ── Header ── -->
+    <header id="header">
+      <div class="logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <line x1="12" y1="3" x2="12" y2="9" />
+          <line x1="12" y1="15" x2="12" y2="21" />
+          <line x1="3" y1="12" x2="9" y2="12" />
+          <line x1="15" y1="12" x2="21" y2="12" />
+          <line x1="5.6" y1="5.6" x2="9.2" y2="9.2" />
+          <line x1="14.8" y1="14.8" x2="18.4" y2="18.4" />
+          <line x1="18.4" y1="5.6" x2="14.8" y2="9.2" />
+          <line x1="9.2" y1="14.8" x2="5.6" y2="18.4" />
+        </svg>
+        MindFlow Markdown
+      </div>
+      <span class="tagline">Markdown → Mind Map · Interactif</span>
+    </header>
+
+    <!-- ── Notification bar ── -->
+    <div id="notification" role="alert">
+      <span id="notification-icon">ℹ️</span>
+      <span id="notification-text">Message</span>
+      <button id="notification-close" title="Fermer">×</button>
+    </div>
+
+    <!-- ── Main split ── -->
+    <main id="main">
+
+      <!-- Left panel: Markdown input -->
+      <section class="panel" id="panel-input">
+        <div class="panel-toolbar">
+          <span class="panel-title">Éditeur Markdown</span>
+          <label class="btn btn-ghost" for="file-input" title="Ouvrir un fichier .md (Ctrl+O)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Ouvrir .md
+          </label>
+          <input type="file" id="file-input" accept=".md,.markdown,text/plain" style="display:none" />
+          <button class="btn btn-ghost btn-icon" id="btn-refresh" title="Actualiser la Mind Map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg>
+          </button>
+          <button class="btn btn-ghost btn-icon" id="btn-clear" title="Effacer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14H6L5 6" />
+              <path d="M10 11v6" />
+              <path d="M14 11v6" />
+            </svg>
+          </button>
+        </div>
+        <textarea id="markdown-input" spellcheck="false"
+          placeholder="# Votre Mind Map&#10;&#10;## Idée A&#10;### Sous-idée 1&#10;&#10;## Idée B&#10;### Sous-idée 2"></textarea>
+      </section>
+
+      <!-- Resizer -->
+      <div id="resizer"></div>
+
+      <!-- Right panel: Mindmap output -->
+      <section class="panel" id="panel-output">
+        <div class="panel-toolbar">
+          <span class="panel-title">Mind Map</span>
+          <button class="btn btn-ghost" id="btn-export-svg" title="Exporter en SVG vectoriel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            SVG
+          </button>
+          <button class="btn btn-primary" id="btn-export-html" title="Exporter en HTML autonome interactif">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            HTML
+          </button>
+        </div>
+
+        <div id="mindmap-container">
+          <!-- Empty state -->
+          <div id="empty-state">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <circle cx="12" cy="12" r="3" />
+              <line x1="12" y1="3" x2="12" y2="9" />
+              <line x1="12" y1="15" x2="12" y2="21" />
+              <line x1="3" y1="12" x2="9" y2="12" />
+              <line x1="15" y1="12" x2="21" y2="12" />
+            </svg>
+            <p>Saisissez du Markdown à gauche pour générer votre Mind Map</p>
+          </div>
+
+          <!-- Spinner while rendering -->
+          <div id="spinner" class="hidden">
+            <div class="spinner-ring"></div>
+            <span>Génération en cours…</span>
+          </div>
+
+          <!-- Native markmap SVG -->
+          <svg id="mindmap-svg" class="hidden"></svg>
+
+          <div class="controls-overlay" id="controls-overlay">
+            <button class="btn-control" id="btn-fit" title="Ajuster la vue (Ctrl+F)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 14 4 20 10 20" />
+                <polyline points="20 10 20 4 14 4" />
+                <line x1="14" y1="10" x2="21" y2="3" />
+                <line x1="3" y1="21" x2="10" y2="14" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer id="footer">
+      <span>MindFlow Markdown</span>
+      <span id="char-count">0 caractères</span>
+      <span>Markmap.js · 100% Client-Side</span>
+    </footer>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+
+</html>
