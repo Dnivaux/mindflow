@@ -3,8 +3,13 @@
 MindFlow Markdown — PyInstaller spec file
 Build: pyinstaller mindflow.spec
 
+DEBUGGING:
+  - For development: Change console=True below to see errors in real-time
+  - For final build: Set console=False to hide console
+  - Errors are ALWAYS logged to ~/.mindflow/mindflow.log (see main.py logging setup)
+
 Requirements on target machine:
-  - Node.js (for npx markmap-cli)
+  - Windows 10/11 (for PowerShell COM dialogs)
   - Edge WebView2 (pre-installed on Windows 10/11)
 """
 
@@ -21,11 +26,15 @@ a = Analysis(
     hiddenimports=[
         'webview',
         'webview.platforms.winforms',
+        'subprocess',  # Used for PowerShell dialogs
+        'threading',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=[
+        'tkinter',  # Removed — using PowerShell instead
+    ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -48,10 +57,11 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,           # No console window
+    console=False,  # Set to True during debugging to see console output
     disable_windowed_traceback=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='logo.ico',         # Custom icon
+    icon='logo.ico',  # Custom icon
 )
+

@@ -70,9 +70,8 @@ function renderMindmap() {
     if (scripts) loadJS(scripts, { getMarkmap: () => window.markmap });
 
     if (!mm) {
-      // Initialize first time
+      // Initialize first time — default Markmap color palette
       mm = Markmap.create(svgEl, {
-        color: (node) => node.state?.color || '#3b82f6',
         paddingX: 16,
         autoFit: true,
       }, root);
@@ -118,20 +117,30 @@ textarea.addEventListener('input', () => {
   debounceTimer = setTimeout(() => renderMindmap(), DEBOUNCE_MS);
 });
 
-/* ═══ Open file ═══════════════════════════════════════════════════════════ */
-document.getElementById('file-input').addEventListener('change', function () {
-  const file = this.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    textarea.value = e.target.result;
+/* ═══ Open file — via API Python (PowerShell COM, thread-safe) ═══════════ */
+async function openFileViaPython() {
+  try {
+    showNotif('Ouverture du fichier…', 'info', 1500);
+    const content = await window.pywebview.api.open_file_dialog();
+    if (content === null || content === undefined) {
+      // User cancelled — silent
+      hideNotif();
+      return;
+    }
+    if (content === '__ERROR__') {
+      showNotif('Impossible de lire le fichier.', 'error');
+      return;
+    }
+    textarea.value = content;
     textarea.dispatchEvent(new Event('input'));
-    showNotif(`« ${file.name} » chargé.`, 'success');
-  };
-  reader.onerror = () => showNotif('Impossible de lire le fichier.', 'error');
-  reader.readAsText(file, 'utf-8');
-  this.value = '';
-});
+    showNotif('Fichier chargé avec succès.', 'success');
+  } catch (e) {
+    showNotif(`Erreur ouverture : ${e.message}`, 'error');
+    console.error('openFileViaPython error:', e);
+  }
+}
+
+document.getElementById('btn-open').addEventListener('click', openFileViaPython);
 
 /* ═══ Refresh & Fit buttons ═══════════════════════════════════════════════ */
 document.getElementById('btn-refresh').addEventListener('click', () => {
@@ -198,38 +207,51 @@ document.getElementById('btn-export-html').addEventListener('click', async () =>
     showNotif("Aucune Mind Map à exporter.", 'info'); return;
   }
 
-  const md = textarea.value;
-  // Create a fully standalone HTML document payload containing the Markmap structure
-  const standaloneHtml = `<!DOCTYPE html>
+  showNotif('Préparation de l\'export…', 'info', 0);
+
+  try {
+    // Load vendor scripts from Python (reads local files — no CDN dependency)
+    const vendors = await window.pywebview.api.get_vendor_scripts();
+    if (!vendors) {
+      showNotif('Erreur : impossible de lire les scripts vendor.', 'error');
+      return;
+    }
+
+    const md = textarea.value;
+    const safeMd = md.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+
+    // Fully standalone HTML — all scripts embedded inline, zero network dependency
+    const standaloneHtml = `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mind Map Export</title>
   <style>
-    body { margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
     svg { width: 100%; height: 100%; display: block; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.0/dist/browser/index.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.0/dist/browser/index.js"></script>
+  <script>${vendors.d3}</script>
+  <script>${vendors.markmap_lib}</script>
+  <script>${vendors.markmap_view}</script>
 </head>
 <body>
   <svg id="markmap"></svg>
   <script>
-    const md = \`${md.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
-    const { Transformer, Markmap, loadCSS, loadJS } = window.markmap;
+    const md = \`${safeMd}\`;
+    const { Transformer, Markmap } = window.markmap;
     const transformer = new Transformer();
-    const { root, features } = transformer.transform(md);
-    const { styles, scripts } = transformer.getUsedAssets(features);
-    if (styles) loadCSS(styles);
-    if (scripts) loadJS(scripts, { getMarkmap: () => window.markmap });
-    Markmap.create('#markmap', { autoFit: true }, root);
+    const { root } = transformer.transform(md);
+    Markmap.create(document.getElementById('markmap'), { autoFit: true }, root);
   </script>
 </body>
 </html>`;
 
-  await saveViaDialog(standaloneHtml, 'html');
+    await saveViaDialog(standaloneHtml, 'html');
+  } catch (e) {
+    showNotif(`Erreur export HTML : ${e.message}`, 'error');
+    console.error(e);
+  }
 });
 
 /* ═══ Resizer ═════════════════════════════════════════════════════════════ */
@@ -267,7 +289,7 @@ document.getElementById('btn-export-html').addEventListener('click', async () =>
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
     e.preventDefault();
-    document.querySelector('label[for="file-input"]').click();
+    openFileViaPython();
   }
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     e.preventDefault();

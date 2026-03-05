@@ -7,10 +7,10 @@
   <title>MindFlow Markdown</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Markmap — Loaded from CDN (Ensures no Node.js required) -->
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.17.0/dist/browser/index.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.17.0/dist/browser/index.js"></script>
+  <!-- Markmap — Loaded from local vendor (no CDN, no internet required) -->
+  <script src="vendor/d3.min.js"></script>
+  <script src="vendor/markmap-lib.umd.js"></script>
+  <script src="vendor/index.js"></script>
 </head>
 
 <body>
@@ -50,15 +50,14 @@
       <section class="panel" id="panel-input">
         <div class="panel-toolbar">
           <span class="panel-title">Éditeur Markdown</span>
-          <label class="btn btn-ghost" for="file-input" title="Ouvrir un fichier .md (Ctrl+O)">
+          <button class="btn btn-ghost" id="btn-open" title="Ouvrir un fichier .md (Ctrl+O)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
             Ouvrir .md
-          </label>
-          <input type="file" id="file-input" accept=".md,.markdown,text/plain" style="display:none" />
+          </button>
           <button class="btn btn-ghost btn-icon" id="btn-refresh" title="Actualiser la Mind Map">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
